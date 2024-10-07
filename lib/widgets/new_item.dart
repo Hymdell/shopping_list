@@ -22,20 +22,25 @@ class _NewItemState extends State<NewItem> {
 
   void _saveItem() async {
     if (_formKey.currentState!.validate()) {
+      _formKey.currentState!.save();
       setState(() {
         _isSending = true;
       });
-      _formKey.currentState!.save();
-      final url = Uri.https('url do seu banco', 'shopping-list.json');
-      final response = await http.post(url,
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: json.encode({
+      final url = Uri.https(
+          'url do seu banco', 'shopping-list.json');
+      final response = await http.post(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: json.encode(
+          {
             'name': _enteredName,
             'quantity': _enteredQuantity,
             'category': _selectedCategory.title,
-          }));
+          },
+        ),
+      );
 
       final Map<String, dynamic> resData = json.decode(response.body);
 
@@ -43,11 +48,14 @@ class _NewItemState extends State<NewItem> {
         return;
       }
 
-      Navigator.of(context).pop(GroceryItem(
+      Navigator.of(context).pop(
+        GroceryItem(
           id: resData['name'],
           name: _enteredName,
           quantity: _enteredQuantity,
-          category: _selectedCategory));
+          category: _selectedCategory,
+        ),
+      );
     }
   }
 
@@ -90,7 +98,7 @@ class _NewItemState extends State<NewItem> {
                         label: Text('Quantity'),
                       ),
                       keyboardType: TextInputType.number,
-                      initialValue: '1',
+                      initialValue: _enteredQuantity.toString(),
                       validator: (value) {
                         if (value == null ||
                             value.isEmpty ||
@@ -108,29 +116,30 @@ class _NewItemState extends State<NewItem> {
                   const SizedBox(width: 8),
                   Expanded(
                     child: DropdownButtonFormField(
-                        value: _selectedCategory,
-                        items: [
-                          for (final category in categories.entries)
-                            DropdownMenuItem(
-                              value: category.value,
-                              child: Row(
-                                children: [
-                                  Container(
-                                    width: 16,
-                                    height: 16,
-                                    color: category.value.color,
-                                  ),
-                                  const SizedBox(width: 6),
-                                  Text(category.value.title),
-                                ],
-                              ),
+                      value: _selectedCategory,
+                      items: [
+                        for (final category in categories.entries)
+                          DropdownMenuItem(
+                            value: category.value,
+                            child: Row(
+                              children: [
+                                Container(
+                                  width: 16,
+                                  height: 16,
+                                  color: category.value.color,
+                                ),
+                                const SizedBox(width: 6),
+                                Text(category.value.title),
+                              ],
                             ),
-                        ],
-                        onChanged: (value) {
-                          setState(() {
-                            _selectedCategory = value!;
-                          });
-                        }),
+                          ),
+                      ],
+                      onChanged: (value) {
+                        setState(() {
+                          _selectedCategory = value!;
+                        });
+                      },
+                    ),
                   ),
                 ],
               ),
@@ -146,7 +155,6 @@ class _NewItemState extends State<NewItem> {
                           },
                     child: const Text('Reset'),
                   ),
-                  const SizedBox(width: 8),
                   ElevatedButton(
                     onPressed: _isSending ? null : _saveItem,
                     child: _isSending
